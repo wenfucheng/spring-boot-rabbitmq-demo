@@ -1,0 +1,12 @@
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: test_virtual_host
+    demo:
+      exchange: test_virtual_host.rabbit.demo.exchange
+      routing-key-prefix: test_virtual_host.rabbit.demo.
+server:
+  port: 8080
