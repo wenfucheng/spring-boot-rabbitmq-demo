@@ -94,6 +94,7 @@ public class RabbitmqConfig {
                                                                          DemoRabbitMsgListener demoRabbitMsgListener){
         /**
          * 声明一个TopicExchange
+         * autoDelete: 是否自动解绑
          */
         TopicExchange topicExchange = new TopicExchange(exchange,true,false);
 
@@ -101,9 +102,17 @@ public class RabbitmqConfig {
          * 声明一个Demo Queue, 并指定其死信队列 (死信队列必须在Queue的创建参数指定)
          */
         Map<String, Object> arguments = new HashMap<>();
+        /**
+         * 消息变成死信有以下几种情况：
+         * 消息被拒绝（basic.reject/ basic.nack）并且requeue=false
+         * 消息TTL过期（参考：RabbitMQ之TTL（Time-To-Live 过期时间））
+         * 队列达到最大长度
+         *
+         * 队列属性改变需要先在rabbitmq界面删除queue
+         */
         arguments.put("x-dead-letter-exchange",dlxExchangeName); // 指定死信队列
         arguments.put("x-dead-letter-routing-key",routingKey); // 指定死信队列routing-key
-        //arguments.put("x-message-ttl",6000);
+        //arguments.put("x-message-ttl",6000); //指定消息超时时间
         Queue queue = new Queue(queueName,true,false,false,arguments);
         // 将queue和exchange按照指定routingKey绑定起来
         Binding binding = BindingBuilder.bind(queue).to(topicExchange).with(routingKey);
@@ -140,6 +149,7 @@ public class RabbitmqConfig {
         messageListenerContainer.setChannelTransacted(true);
         messageListenerContainer.setQueues(queue); // 监听队列
         messageListenerContainer.setMessageListener(messageListener); // 监听类
+        //messageListenerContainer.setAcknowledgeMode(AcknowledgeMode.MANUAL);//设置手动应答模式, 默认自动应答
         return messageListenerContainer;
     }
 }
