@@ -54,8 +54,8 @@ public class DemoRabbitMsgListener implements ChannelAwareMessageListener {
         //参数1: 消息标识id,
         //参数2: 是否应答所有小于此标识id的消息
         //channel.basicAck(message.getMessageProperties().getDeliveryTag(),false); // 应答消息, Broker收到应答从queue中移除消息
-        //参数2: 是否重新发送该消息 false -> 进入死信队列  true -> Broker重新发送消息
-        channel.basicReject(message.getMessageProperties().getDeliveryTag(),true); // 拒绝消息, 该条消息被发送至死信队列, 由死信队列监听器消费
+        //参数2: 是否重新发送该消息 false -> 有死信队列进入死信队列, 无死信队列直接移除  true -> Broker重新发送消息
+        channel.basicReject(message.getMessageProperties().getDeliveryTag(),true);
     }
 
 
